@@ -1,14 +1,22 @@
+import { IPost } from "../..";
+import { relativeDateFormatter } from "../../../../utils/formater";
 import { PostContainer } from "./styles";
 
-export function Post(){
+interface PostProps{
+    post: IPost
+}
+
+export function Post({post}: PostProps){
+    const formattedDate = relativeDateFormatter(post.created_at);
+
     return (
-        <PostContainer to="/post/1">
+        <PostContainer to={`/post/${post.number}`}>
             <div>
-                <strong>ReactJS_DTMoney</strong>
-                <span>Há 4 dias atrás</span>
+                <strong>{post.title}</strong>
+                <span>{formattedDate}</span>
             </div>
             <p>
-                Financial control project focused on API consumption (simulating using JSONServer), accessibility and performance
+                {post.body}
             </p>
         </PostContainer>
     )
