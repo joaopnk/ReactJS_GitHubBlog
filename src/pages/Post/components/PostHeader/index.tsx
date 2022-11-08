@@ -1,48 +1,71 @@
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
-import { faCalendar, faChevronLeft, faComment } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCalendar,
+  faChevronLeft,
+  faComment,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
 import { ExternalLink } from "../../../../components/ExternalLink";
+import { Spinner } from "../../../../components/Spinner";
+import { relativeDateFormatter } from "../../../../utils/formater";
+import { IPost } from "../../../Blog";
 import { PostHeaderContainer } from "./styles";
 
-export function PostHeader(){
-    const navigate = useNavigate();
+interface PostHeaderProps {
+  postData: IPost;
+  isLoading: boolean;
+}
 
-    function goBack(){
-        // Voltando uma rota
-        navigate(-1);
-    }
+export function PostHeader({ isLoading, postData }: PostHeaderProps) {
+  const navigate = useNavigate();
 
-    return (
-        <PostHeaderContainer>
-            <header>
-                <ExternalLink 
-                    as="button" 
-                    onClick={goBack}
-                    icon={<FontAwesomeIcon icon={faChevronLeft} />} 
-                    text="Voltar" 
-                    href="#" 
-                    variant="iconLeft"
-                    />
-                <ExternalLink text="Ver no Github" href="#" target="_blank"/>
-            </header>
+  function goBack() {
+    // Voltando uma rota
+    navigate(-1);
+  }
 
-            <h1>Javascript Data types and data structures</h1>
-            <ul>
-                <li>
-                    <FontAwesomeIcon icon={faGithub}/>
-                    joaopnk
-                </li>
-                <li>
-                    <FontAwesomeIcon icon={faCalendar} />
-                    Há 2 dias
-                </li>
-                <li>
-                    <FontAwesomeIcon icon={faComment} />
-                    5 Comentararios
-                </li>
-            </ul>
-            
-        </PostHeaderContainer>
-    )   
+  const formattedDate = relativeDateFormatter(postData?.created_at);
+
+  return (
+    <PostHeaderContainer>
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <>
+          <header>
+            <ExternalLink
+              as="button"
+              onClick={goBack}
+              icon={<FontAwesomeIcon icon={faChevronLeft} />}
+              text="Voltar"
+              href="#"
+              variant="iconLeft"
+            />
+            <ExternalLink
+              text="Ver no Github"
+              href={postData.html_url}
+              target="_blank"
+            />
+          </header>
+
+          <h1>{postData.title}</h1>
+          <ul>
+            <li>
+              <FontAwesomeIcon icon={faGithub} />
+              {postData.user.login}
+            </li>
+            <li>
+              <FontAwesomeIcon icon={faCalendar} />
+              {formattedDate}
+            </li>
+            <li>
+              <FontAwesomeIcon icon={faComment} />
+              {postData.comments} Comentararios
+            </li>
+          </ul>
+        </>
+      )}
+    </PostHeaderContainer>
+  );
 }

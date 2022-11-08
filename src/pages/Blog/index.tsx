@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Spinner } from "../../components/Spinner";
 import { api } from "../../lib/axios";
 import { Post } from "./components/Post";
 import { Profile } from "./components/Profile";
@@ -9,55 +10,59 @@ import { PostListContainer } from "./styles";
 const username = import.meta.env.VITE_GITHUB_USERNAME;
 const reponame = import.meta.env.VITE_GITHUB_REPONAME;
 
-
-export interface IPost{
-    title: string;
-    body: string;
-    created_at: string;
-    number: number;
-    html_url: string;
-    comments: number;
-    users: {
-        login: string;
-    };
+export interface IPost {
+  title: string;
+  body: string;
+  created_at: string;
+  number: number;
+  html_url: string;
+  comments: number;
+  user: {
+    login: string;
+  };
 }
 
-export function Blog(){
-    const [posts, setPosts] = useState<IPost[]>([]);
+export function Blog() {
+  const [posts, setPosts] = useState<IPost[]>([]);
 
-    // Estado de load para melhor experiencia do usuario
-    const [isLoading, setIsLoading] = useState(true);
+  // Estado de load para melhor experiencia do usuario
+  const [isLoading, setIsLoading] = useState(true);
 
-    const getPosts = useCallback(async (query: string = "") => {
-        try{
-            setIsLoading(true);
-            const response = await api.get(`/search/issues?q=${query}%20repo:${username}/${reponame}`);
+  const getPosts = useCallback(
+    async (query: string = "") => {
+      try {
+        setIsLoading(true);
+        const response = await api.get(
+          `/search/issues?q=${query}%20repo:${username}/${reponame}`
+        );
 
-            console.log(response.data);
-            setPosts(response.data.items);
-        }
-        finally{
-            setIsLoading(false);
-        }
-    }, [posts]);
+        setPosts(response.data.items);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [posts]
+  );
 
-    useEffect(() => {
-        getPosts();
-    }, []);
+  useEffect(() => {
+    getPosts();
+  }, []);
 
-    return (
+  return (
+    <>
+      <Profile />
+      <SearchInput postLenght={posts.length} getPosts={getPosts} />
+      {isLoading ? (
+        <Spinner />
+      ) : (
         <>
-            <Profile />
-            <SearchInput />
-            <PostListContainer>
-                {posts.map((post) => (
-                    <Post 
-                        key={post.number}
-                        post={post}
-                    />
-
-                ))}
-            </PostListContainer>
+          <PostListContainer>
+            {posts.map((post) => (
+              <Post key={post.number} post={post} />
+            ))}
+          </PostListContainer>
         </>
-    )
+      )}
+    </>
+  );
 }

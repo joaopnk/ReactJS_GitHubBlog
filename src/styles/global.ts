@@ -1,6 +1,15 @@
 import { createGlobalStyle} from 'styled-components';
+import FireCode from '../assets/fonts/FiraCode-Regular.woff'
 
 export const GlobalStyles = createGlobalStyle`
+    /* APlicando font global */
+    @font-face{
+        font-family: 'FireCode';
+        src: url(${FireCode}) format('woff');
+        font-weight: 400;
+        font-style: normal;
+    }
+
     *{
         margin: 0;
         padding: 0;
